@@ -13,9 +13,9 @@ const $ENVIRONMENT = process.env.NODE_ENV || 'development';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.development.env`,
+      envFilePath: `.${$ENVIRONMENT}.env`,
     }),
-    MongooseModule.forRoot('mongodb://localhost:27017/short-url'),
+    MongooseModule.forRoot(`${process.env.MONGODB_URI}`),
     ShorturlModule,
     CounterurlModule,
     UserModule,
