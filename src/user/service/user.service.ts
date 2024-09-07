@@ -68,8 +68,7 @@ export class UsersService {
       const user = await this.userModel.findOne({
         _id: new Types.ObjectId(sub),
       });
-
-      console.log(user);
+      
       if (!user) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',

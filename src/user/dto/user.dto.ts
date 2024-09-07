@@ -4,7 +4,7 @@ import { IsEmail, IsString } from 'class-validator';
 export class UserDto {
   @ApiProperty({
     type: String,
-    example: 'user123', // Ejemplo del nombre de usuario
+    example: 'user123',
     description: 'The username of the user',
   })
   @IsString()
@@ -12,7 +12,7 @@ export class UserDto {
 
   @ApiProperty({
     type: String,
-    example: 'user@example.com', // Ejemplo de correo electrónico
+    example: 'user@example.com',
     description: 'The email address of the user',
   })
   @IsEmail()
@@ -20,7 +20,7 @@ export class UserDto {
 
   @ApiProperty({
     type: String,
-    example: '+123456789', // Ejemplo de número de teléfono
+    example: '+123456789',
     description: 'The phone number of the user',
   })
   @IsString()
@@ -28,7 +28,7 @@ export class UserDto {
 
   @ApiProperty({
     type: String,
-    example: 'password123', // Ejemplo de contraseña
+    example: 'password123',
     description: 'The password of the user',
   })
   @IsString()
@@ -38,7 +38,7 @@ export class UserDto {
 export class UpdateUserDto {
   @ApiPropertyOptional({
     type: String,
-    example: 'updateduser123', // Ejemplo de nombre de usuario actualizado
+    example: 'updateduser123',
     description: 'The updated username of the user',
   })
   @IsString()
@@ -46,7 +46,7 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional({
     type: String,
-    example: 'updateduser@example.com', // Ejemplo de correo electrónico actualizado
+    example: 'updateduser@example.com',
     description: 'The updated email address of the user',
   })
   @IsEmail()
@@ -54,7 +54,7 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional({
     type: String,
-    example: '+987654321', // Ejemplo de número de teléfono actualizado
+    example: '+987654321',
     description: 'The updated phone number of the user',
   })
   @IsString()
@@ -62,7 +62,7 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional({
     type: String,
-    example: 'newpassword123', // Ejemplo de nueva contraseña
+    example: 'newpassword123',
     description: 'The updated password of the user',
   })
   @IsString()
