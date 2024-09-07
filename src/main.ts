@@ -30,6 +30,7 @@ async function bootstrap() {
   const $PORT = configService.get('PORT') || 3000;
 
   await app.listen($PORT);
+  console.log(process.env.NODE_ENV);
   console.log(`Listening in ${await app.getUrl()}`);
 }
 
