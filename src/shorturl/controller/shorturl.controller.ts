@@ -79,7 +79,7 @@ export class ShorturlController {
     return response;
   }
 
-  @Get('/allUrls')
+  @Get('allUrls')
   @ApiOperation({ summary: 'Retrieve all short URLs' })
   @ApiResponse({
     status: 200,
