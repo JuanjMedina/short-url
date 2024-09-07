@@ -1,9 +1,10 @@
+import { User } from '@/user/model/user.model';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type ShortUrlDocument = HydratedDocument<ShortUrl>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class ShortUrl {
   @Prop()
   url: string;
@@ -11,11 +12,11 @@ export class ShortUrl {
   @Prop()
   shortUrl: string;
 
-  @Prop({ default: Date.now() })
-  createdAt: Date;
-
-  @Prop({ default: Date.now() })
-  updatedAt: Date;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  })
+  user: User;
 }
-
 export const ShortUrlSchema = SchemaFactory.createForClass(ShortUrl);

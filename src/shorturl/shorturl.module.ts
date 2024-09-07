@@ -4,6 +4,7 @@ import { ShorturlController } from './controller/shorturl.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ShortUrl, ShortUrlSchema } from './model/shortUrl.model';
 import { CounterurlModule } from '@/counterurl/counterurl.module';
+import { UserModule } from '@/user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CounterurlModule } from '@/counterurl/counterurl.module';
       },
     ]),
     CounterurlModule,
+    UserModule,
   ],
   providers: [ShorturlService],
   controllers: [ShorturlController],

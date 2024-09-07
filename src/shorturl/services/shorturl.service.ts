@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ShortUrlDto, UpdateShortUrlDto } from '../dto/shortUrl.dto';
+import {
+  ShortUrlDto,
+  ShortUrlPersonalizeDto,
+  UpdateShortUrlDto,
+} from '../dto/shortUrl.dto';
 import { convertBase10ToBase62 } from '@/utils/utils';
 import { InjectModel } from '@nestjs/mongoose';
 import { ShortUrl, ShortUrlDocument } from '../model/shortUrl.model';
@@ -7,12 +11,14 @@ import { Model } from 'mongoose';
 import { CounterurlService } from '@/counterurl/service/counterurl.service';
 import { ErrorManager } from '@/utils/error.manager';
 import { $URL_SHORT } from '@/constants/url.constant';
+import { UsersService } from '@/user/service/user.service';
 
 @Injectable()
 export class ShorturlService {
   constructor(
     @InjectModel(ShortUrl.name) private shortUrlModel: Model<ShortUrlDocument>,
     private readonly counterUrlService: CounterurlService,
+    private readonly userService: UsersService,
   ) {}
 
   async searchShortUrl(shortUrl: string): Promise<ShortUrl> {
@@ -52,6 +58,46 @@ export class ShorturlService {
       };
       return responseObject;
     } catch (Err) {}
+  }
+
+  async createPersonalizeUrl(
+    idUser: string,
+    roleUser: string,
+    body: ShortUrlPersonalizeDto,
+  ): Promise<ShortUrl> {
+    try {
+      const { URL, name } = body;
+      const { sequence_value } = await this.counterUrlService.getNextUrl();
+
+      //TODO : Verificar si el usuario existe !
+      const user = await this.userService.findUserById(idUser);
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Invalid User ',
+        });
+      }
+      let shortUrl = name;
+      const hashString = convertBase10ToBase62(sequence_value);
+      shortUrl += hashString;
+
+      const responseShortUrl = await this.searchShortUrl(shortUrl);
+
+      if (responseShortUrl) {
+        const { sequence_value } = await this.counterUrlService.getNextUrl();
+        shortUrl = convertBase10ToBase62(sequence_value);
+      }
+      const createdShortUrl = new this.shortUrlModel({
+        url: URL,
+        shortUrl: shortUrl,
+        user: idUser,
+      }).save();
+
+      return createdShortUrl;
+    } catch (Err) {
+      throw ErrorManager.createSignatureError(Err.message);
+    }
   }
 
   async allUrls(): Promise<ShortUrl[]> {

@@ -6,12 +6,21 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ShorturlService } from '../services/shorturl.service';
-import { ShortUrlDto, UpdateShortUrlDto } from '../dto/shortUrl.dto';
-import { Response, urlencoded } from 'express';
+import {
+  ShortUrlDto,
+  ShortUrlPersonalizeDto,
+  UpdateShortUrlDto,
+} from '../dto/shortUrl.dto';
+import { Request, Response, urlencoded } from 'express';
+import { AuthGuard } from '@/auth/guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('ShortUrl')
 @Controller('shorturl')
 export class ShorturlController {
   constructor(private readonly shortUrlService: ShorturlService) {}
@@ -19,6 +28,21 @@ export class ShorturlController {
   @Post('createShortUrl')
   createShortUrl(@Body() shortUrlDto: ShortUrlDto) {
     return this.shortUrlService.createShortUrl(shortUrlDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('createShortUrlPersonalize')
+  createPersonalizeUrl(
+    @Req() req: Request,
+    @Body() body: ShortUrlPersonalizeDto,
+  ) {
+    const { idUser, roleUser } = req;
+    const response = this.shortUrlService.createPersonalizeUrl(
+      idUser,
+      roleUser,
+      body,
+    );
+    return response;
   }
 
   @Get('/allUrlss')
