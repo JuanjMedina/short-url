@@ -4,7 +4,11 @@ import { ErrorManager } from '@/utils/error.manager';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { PayloadToken } from '../interfaces/auth.interfaces';
+import {
+  iJWTRefreshToken,
+  IJWTResponseToken,
+  PayloadToken,
+} from '../interfaces/auth.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -55,7 +59,7 @@ export class AuthService {
     return jwt.sign(payload, secret, { expiresIn: expired });
   }
 
-  public async generateJWT(user: User) {
+  public async generateJWT(user: User): Promise<IJWTResponseToken> {
     const payload: PayloadToken = {
       role: user.role,
       sub: user._id,
@@ -69,5 +73,26 @@ export class AuthService {
     return {
       AccessToken: accessToken,
     };
+  }
+
+  public async refreshToken(
+    idUser: string,
+    roleUser: string,
+  ): Promise<iJWTRefreshToken> {
+    try {
+      const payload: PayloadToken = {
+        role: roleUser,
+        sub: idUser,
+      };
+
+      const accessToken = await this.signJWT({
+        payload,
+        secret: 'secret',
+        expired: '1h',
+      });
+      return { RefreshToken: accessToken };
+    } catch (Err) {
+      console.log(Err);
+    }
   }
 }
