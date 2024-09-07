@@ -3,7 +3,7 @@ import { User } from '@/user/model/user.model';
 
 export interface PayloadToken {
   sub: string;
-  role: ROLES;
+  role: ROLES | string;
 }
 
 export interface AuthTokenResult {
@@ -22,4 +22,12 @@ export interface IUseToken {
 export interface IDeleteUser {
   message: string;
   user: User;
+}
+
+export interface IJWTResponseToken {
+  AccessToken: string;
+}
+
+export interface iJWTRefreshToken {
+  RefreshToken: string;
 }
