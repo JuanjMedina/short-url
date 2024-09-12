@@ -13,10 +13,10 @@ export class CounterurlService {
   ) {}
 
   async getNextUrl(): Promise<CounterUrl> {
-    const $Id = '66d28c678869e05d1abad1c7';
     const counter = await this.counterUrlModel.findOneAndUpdate(
-      { _id: $Id },
+      {},
       { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true },
     );
     return counter;
   }

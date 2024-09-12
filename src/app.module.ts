@@ -7,7 +7,7 @@ import { CounterurlModule } from './counterurl/counterurl.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 
-const $ENVIRONMENT = process.env.NODE_ENV.trim() || 'development';
+const $ENVIRONMENT = process.env.NODE_ENV.trimEnd() || 'development';
 
 @Module({
   imports: [
