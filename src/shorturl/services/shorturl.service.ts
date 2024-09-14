@@ -34,6 +34,7 @@ export class ShorturlService {
     try {
       const { URL } = shortUrlDto;
       const { sequence_value } = await this.counterUrlService.getNextUrl();
+      console.log(`secuence_value ${sequence_value}`);
 
       let shortUrl: string;
       shortUrl = convertBase10ToBase62(sequence_value);
@@ -64,7 +65,7 @@ export class ShorturlService {
     idUser: string,
     roleUser: string,
     body: ShortUrlPersonalizeDto,
-  ): Promise<ShortUrl> {
+  ): Promise<Omit<ShortUrl, 'user' | '_id'>> {
     try {
       const { URL, name } = body;
       const { sequence_value } = await this.counterUrlService.getNextUrl();
@@ -88,13 +89,14 @@ export class ShorturlService {
         const { sequence_value } = await this.counterUrlService.getNextUrl();
         shortUrl = convertBase10ToBase62(sequence_value);
       }
-      const createdShortUrl = new this.shortUrlModel({
+      const createdShortUrl = await new this.shortUrlModel({
         url: URL,
         shortUrl: shortUrl,
         user: idUser,
       }).save();
-
-      return createdShortUrl;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { user: createdUser, _id, ...responseObject } = createdShortUrl;
+      return responseObject;
     } catch (Err) {
       throw ErrorManager.createSignatureError(Err.message);
     }
@@ -122,6 +124,7 @@ export class ShorturlService {
       const { url } = foundUrl;
       return url;
     } catch (Err) {
+      console.log(Err);
       throw ErrorManager.createSignatureError(Err.message);
     }
   }
@@ -166,6 +169,25 @@ export class ShorturlService {
       );
 
       return responseUrlEncoded;
+    } catch (Err) {
+      throw ErrorManager.createSignatureError(Err.message);
+    }
+  }
+
+  async getShortUrlsByUser(idUser: string) {
+    try {
+      const shortUrlUser = await this.shortUrlModel
+        .find({
+          user: idUser,
+        })
+        .select('-user');
+      if (!shortUrlUser || shortUrlUser.length < 0) {
+        throw new ErrorManager({
+          message: 'Invalid credentials ',
+          type: 'BAD_REQUEST',
+        });
+      }
+      return shortUrlUser;
     } catch (Err) {
       throw ErrorManager.createSignatureError(Err.message);
     }

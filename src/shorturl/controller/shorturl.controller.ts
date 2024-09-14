@@ -32,6 +32,14 @@ import {
 export class ShorturlController {
   constructor(private readonly shortUrlService: ShorturlService) {}
 
+  @UseGuards(AuthGuard)
+  @Get('shortUrlsUser')
+  async getShortsUrlsByUser(@Req() req: Request) {
+    const { idUser } = req;
+
+    return await this.shortUrlService.getShortUrlsByUser(idUser);
+  }
+
   @Post('createShortUrl')
   @ApiOperation({ summary: 'Create a new short URL' })
   @ApiBody({
@@ -117,6 +125,7 @@ export class ShorturlController {
     @Res() res: Response,
   ) {
     const url = await this.shortUrlService.searchUrl(urlEncoded);
+    console.log(url);
     if (url) {
       return res.redirect(url);
     } else {

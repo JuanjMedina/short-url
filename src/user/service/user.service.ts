@@ -15,19 +15,20 @@ export class UsersService {
   public async createUser(body: UserDto): Promise<User> {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
-      const userExists = await this.userModel.findOne({ email: body.email });
+      // const userExists = await this.userModel.findOne({ email: body.email });
 
-      if (userExists) {
-        throw new ErrorManager({
-          message: 'User already exists',
-          type: 'BAD_REQUEST',
-        });
-      }
+      // if (userExists) {
+      //   throw new ErrorManager({
+      //     message: 'User already exists',
+      //     type: 'BAD_REQUEST',
+      //   });
+      // }
 
       const userCreated = await this.userModel.create({
         ...body,
         password: hashedPassword,
       });
+      userCreated.save();
 
       return userCreated;
     } catch (error) {
@@ -68,7 +69,7 @@ export class UsersService {
       const user = await this.userModel.findOne({
         _id: new Types.ObjectId(sub),
       });
-      
+
       if (!user) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
