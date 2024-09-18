@@ -1,4 +1,4 @@
-import { ROLES } from '@/constants/roles';
+import { ROLES } from '../../constants/roles';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 

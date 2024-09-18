@@ -17,7 +17,7 @@ import {
   UpdateShortUrlDto,
 } from '../dto/shortUrl.dto';
 import { Request, Response } from 'express';
-import { AuthGuard } from '@/auth/guards/auth.guard';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 import {
   ApiTags,
   ApiOperation,

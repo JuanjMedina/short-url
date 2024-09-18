@@ -1,14 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { CounterUrl, CounterUrlDocument } from '../model/counterurl.model';
-import { Connection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class CounterurlService {
   constructor(
     @InjectModel(CounterUrl.name)
     private counterUrlModel: Model<CounterUrlDocument>,
-    @InjectConnection() private connection: Connection,
   ) {}
 
   async findOne(): Promise<CounterUrl | null> {
@@ -24,10 +23,11 @@ export class CounterurlService {
 
   async createCounterUrl(): Promise<CounterUrl> {
     try {
-      const createdCounterUrl = new this.counterUrlModel({
+      const createdCounterUrl = await this.counterUrlModel.create({
         sequence_value: 1000000000000,
       });
-      return await createdCounterUrl.save();
+
+      return createdCounterUrl;
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -44,25 +44,27 @@ export class CounterurlService {
         counterUrl = await this.createCounterUrl();
       }
 
-      const updatedCounter = await this.counterUrlModel.findOneAndUpdate(
-        { _id: counterUrl._id },
-        { $inc: { sequence_value: 1 } },
-        { new: true },
-      );
-
-      if (!updatedCounter) {
-        throw new HttpException(
-          'Error updating counter URL',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+      const updatedCounter = await this.counterUrlModel
+        .findOneAndUpdate(
+          { _id: counterUrl._id },
+          { $inc: { sequence_value: 1 } },
+          { new: true },
+        )
+        .exec();
+      console.log(updatedCounter);
+      // if (!updatedCounter) {
+      //   throw new HttpException(
+      //     'Error updating counter URL',
+      //     HttpStatus.INTERNAL_SERVER_ERROR,
+      //   );
+      // }
 
       return updatedCounter;
     } catch (error) {
-      throw new HttpException(
-        'Error retrieving the next URL',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      // throw new HttpException(
+      //   'Error retrieving the next URL',
+      //   HttpStatus.INTERNAL_SERVER_ERROR,
+      // );
     }
   }
 }

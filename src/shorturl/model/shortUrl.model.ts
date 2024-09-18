@@ -1,4 +1,4 @@
-import { User } from '@/user/model/user.model';
+import { User } from '../../user/model/user.model';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 

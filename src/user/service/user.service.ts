@@ -4,8 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../model/user.model';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto, UserDto } from '../dto/user.dto';
-import { ErrorManager } from '@/utils/error.manager';
-import { IDeleteUser } from '@/auth/interfaces/auth.interfaces';
+import { ErrorManager } from '../../utils/error.manager';
+import { IDeleteUser } from '../../auth/interfaces/auth.interfaces';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -15,20 +16,22 @@ export class UsersService {
   public async createUser(body: UserDto): Promise<User> {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
-      // const userExists = await this.userModel.findOne({ email: body.email });
+      const userExists = await this.userModel.findOne({ email: body.email });
 
-      // if (userExists) {
-      //   throw new ErrorManager({
-      //     message: 'User already exists',
-      //     type: 'BAD_REQUEST',
-      //   });
-      // }
+      if (userExists) {
+        throw new ErrorManager({
+          message: 'User already exists',
+          type: 'BAD_REQUEST',
+        });
+      }
 
       const userCreated = await this.userModel.create({
         ...body,
         password: hashedPassword,
       });
-      userCreated.save();
+      console.log(userCreated);
+      const saved = await userCreated.save();
+      console.log(saved);
 
       return userCreated;
     } catch (error) {

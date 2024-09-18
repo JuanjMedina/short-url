@@ -4,14 +4,14 @@ import {
   ShortUrlPersonalizeDto,
   UpdateShortUrlDto,
 } from '../dto/shortUrl.dto';
-import { convertBase10ToBase62 } from '@/utils/utils';
+import { convertBase10ToBase62 } from '../../utils/utils';
 import { InjectModel } from '@nestjs/mongoose';
 import { ShortUrl, ShortUrlDocument } from '../model/shortUrl.model';
 import { Model } from 'mongoose';
-import { CounterurlService } from '@/counterurl/service/counterurl.service';
-import { ErrorManager } from '@/utils/error.manager';
-import { $URL_SHORT } from '@/constants/url.constant';
-import { UsersService } from '@/user/service/user.service';
+import { CounterurlService } from '../../counterurl/service/counterurl.service';
+import { ErrorManager } from '../../utils/error.manager';
+import { $URL_SHORT } from '../../constants/url.constant';
+import { UsersService } from '../../user/service/user.service';
 
 @Injectable()
 export class ShorturlService {
@@ -36,7 +36,7 @@ export class ShorturlService {
       const { sequence_value } = await this.counterUrlService.getNextUrl();
       console.log(`secuence_value ${sequence_value}`);
 
-      let shortUrl: string;
+      let shortUrl;
       shortUrl = convertBase10ToBase62(sequence_value);
 
       const responseShortUrl = await this.searchShortUrl(shortUrl);
@@ -46,18 +46,13 @@ export class ShorturlService {
         shortUrl = convertBase10ToBase62(sequence_value);
       }
 
-      const createdShortUrl = new this.shortUrlModel({
+      const createdShortUrl = await this.shortUrlModel.create({
         url: URL,
         shortUrl: shortUrl,
       });
 
-      const responseCreatedUrl = await createdShortUrl.save();
-      const { url } = responseCreatedUrl;
-      const responseObject = {
-        shortUrl: $URL_SHORT.concat(`${shortUrl}`),
-        url,
-      };
-      return responseObject;
+      const { url } = createdShortUrl;
+      return { url, shortUrl };
     } catch (Err) {}
   }
 
@@ -65,12 +60,11 @@ export class ShorturlService {
     idUser: string,
     roleUser: string,
     body: ShortUrlPersonalizeDto,
-  ): Promise<Omit<ShortUrl, 'user' | '_id'>> {
+  ): Promise<Omit<ShortUrl, 'user'>> {
     try {
       const { URL, name } = body;
       const { sequence_value } = await this.counterUrlService.getNextUrl();
 
-      //TODO : Verificar si el usuario existe !
       const user = await this.userService.findUserById(idUser);
 
       if (!user) {
@@ -89,14 +83,14 @@ export class ShorturlService {
         const { sequence_value } = await this.counterUrlService.getNextUrl();
         shortUrl = convertBase10ToBase62(sequence_value);
       }
-      const createdShortUrl = await new this.shortUrlModel({
+      const createdShortUrl = await this.shortUrlModel.create({
         url: URL,
-        shortUrl: shortUrl,
+        shortUrl,
         user: idUser,
-      }).save();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { user: createdUser, _id, ...responseObject } = createdShortUrl;
-      return responseObject;
+      });
+      const objectResponse = createdShortUrl.toObject();
+      delete objectResponse.user;
+      return objectResponse;
     } catch (Err) {
       throw ErrorManager.createSignatureError(Err.message);
     }

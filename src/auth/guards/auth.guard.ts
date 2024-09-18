@@ -7,9 +7,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IUseToken } from '../interfaces/auth.interfaces';
-import { useToken } from '@/utils/use.token';
-import { PUBLIC_KEY } from '@/constants/key.decorator';
-import { UsersService } from '@/user/service/user.service';
+import { useToken } from '../../utils/use.token';
+import { PUBLIC_KEY } from '../../constants/key.decorator';
+import { UsersService } from '../../user/service/user.service';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
